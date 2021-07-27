@@ -30,17 +30,36 @@ namespace MultiPlayCore
         [Header("TMP")]
         [SerializeField] private TMP_Text quickMatchText;
 
+        [Header("SpawnPos")]
+        [SerializeField] private Transform[] spawnPostions;
+
         public enum State { None, QuickMatching, QuickMatchDone, GameStart, GameDone }
         public State state;
 
+        public int GetIndex
+        {
+            get
+            {
+                for(int i=0; i<PN.PlayerList.Length; i++)
+                {
+                    if(PN.PlayerList[i] == PN.LocalPlayer)
+                    {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+        }
+
         private void Awake()
         {
+            DontDestroyOnLoad(this);
             ShowPanel("ConnectPanel");
             quickMatchText.gameObject.SetActive(false);
         }
 
         /// <summary>
-        /// 각 패널의 이름에 따라 해당 패널만 활성화 하는 함수
+        /// ?? ?????? ?????? ???? ???? ?????? ?????? ???? ????
         /// </summary>
         /// <param name="name"></param>
         private void ShowPanel(string name)
@@ -118,7 +137,7 @@ namespace MultiPlayCore
         }
 
         /// <summary>
-        /// 플레이어의 수 변화에 따라 게임 시작
+        /// ?????????? ?? ?????? ???? ???? ????
         /// </summary>
         private void PlayerChanged()
         {
@@ -137,6 +156,16 @@ namespace MultiPlayCore
         private void GameStart()
         {
             Debug.Log("GameStart");
+            //PN.LoadLevel("Main");
+
+            if(GetIndex != -1)
+            {
+                PN.Instantiate("Player", spawnPostions[GetIndex].position, spawnPostions[GetIndex].rotation);
+            }
+            else
+            {
+                Debug.Log("Pun Index is not available");
+            }
         }
 
         private void Update()
