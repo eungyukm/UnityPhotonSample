@@ -160,7 +160,7 @@ namespace MultiPlayCore
 
             if(GetIndex != -1)
             {
-                PN.Instantiate("Player", spawnPostions[GetIndex].position, spawnPostions[GetIndex].rotation);
+                // PN.Instantiat("Player", spawnPostions[GetIndex].position, spawnPostions[GetIndex].rotation);
             }
             else
             {
