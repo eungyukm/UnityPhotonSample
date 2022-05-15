@@ -2,9 +2,6 @@
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 using UnityEngine.InputSystem;
 #endif
-using Photon.Pun;
-using Photon.Realtime;
-using PN = Photon.Pun.PhotonNetwork;
 
 /* Note: animations are called via the controller for both the character and capsule using animator null checks
  */
@@ -94,9 +91,6 @@ namespace StarterAssets
 
 		private bool _hasAnimator;
 
-		[Header("Photon")]
-		private PhotonView photonView;
-
 		private void Awake()
 		{
 			// get a reference to our main camera
@@ -104,8 +98,6 @@ namespace StarterAssets
 			{
 				_mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
 			}
-
-			photonView = GetComponent<PhotonView>();
 		}
 
 		private void Start()
@@ -124,13 +116,10 @@ namespace StarterAssets
 		private void Update()
 		{
 			_hasAnimator = TryGetComponent(out _animator);
-
-            if (photonView.IsMine)
-            {
-				JumpAndGravity();
-				GroundedCheck();
-				Move();
-			}
+			
+			JumpAndGravity();
+			GroundedCheck();
+			Move();
 		}
 
 		private void LateUpdate()
@@ -211,6 +200,7 @@ namespace StarterAssets
 			_animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
 
 			// normalise input direction
+			Debug.Log("Move : " + _input.move.x);
 			Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
 
 			// note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
