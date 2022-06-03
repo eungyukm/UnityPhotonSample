@@ -1,6 +1,7 @@
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -24,6 +25,8 @@ public class PhotonNetManager : MonoBehaviourPunCallbacks
     public GameObject[] Panels = new GameObject[3];
     public PhotonView PV;
     public PanelState PanelStateValue = PanelState.None;
+    [SerializeField] byte autoMaxPlayer = 1;
+    public Text quickMatchText;
 
     private void Awake()
     {
@@ -45,7 +48,7 @@ public class PhotonNetManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-        PanelStateValue = PanelState.Logined;
+        PanelStateValue = PanelState.Lobby;
         SetPanel();
         PhotonNetwork.LocalPlayer.NickName = NickNameInput.text;
     }
@@ -76,15 +79,61 @@ public class PhotonNetManager : MonoBehaviourPunCallbacks
             }
         }
     }
+    
+    private void PlayerChanged()
+    {
+        if (PhotonNetwork.CurrentRoom.PlayerCount == autoMaxPlayer)
+        {
+
+        }
+        else if (PhotonNetwork.CurrentRoom.PlayerCount != PhotonNetwork.CurrentRoom.MaxPlayers)
+        {
+            return;
+        }
+
+        GameStart();
+    }
+    
+    public void QuickMachClick()
+    {
+        if(PanelStateValue == PanelState.Lobby)
+        {
+            PanelStateValue = PanelState.QuickMatching;
+
+            quickMatchText.gameObject.SetActive(true);
+
+            PhotonNetwork.JoinRandomOrCreateRoom(null, autoMaxPlayer, MatchmakingMode.FillRoom, null, null, 
+                $"room{Random.Range(0,1000)}", new RoomOptions { MaxPlayers = autoMaxPlayer });
+        }
+        else if(PanelStateValue == PanelState.QuickMatching)
+        {
+            PanelStateValue = PanelState.Lobby;
+
+            quickMatchText.gameObject.SetActive(false);
+
+            PhotonNetwork.LeaveRoom();
+        }
+    }
+    
+    // 게임 시작
+    public override void OnJoinedRoom()
+    {
+        PlayerChanged();
+
+    }
+
+    private void GameStart()
+    {
+
+        // PhotonNetwork.LogLevel("Game");
+    }
 }
 
 public enum PanelState
 {
     // 상태 없음
     None,
-    // 로그인 상태
-    Logined,
     // 로비 상태
     Lobby,
-    
+    QuickMatching,
 }
